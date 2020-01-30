@@ -1,6 +1,6 @@
-# hydax API URL
+# Broker API URL
 
-hydax Open API的地址为: https://www.hydax.com/openapi
+Broker Open API的地址请见[这里](endpoint.md)
 
 # 期权公共端点
 
@@ -14,7 +14,7 @@ hydax Open API的地址为: https://www.hydax.com/openapi
 
 ### **Request Url:**
 ```bash
-get /brokerInfo
+GET /openapi/v1/brokerInfo
 ```
 
 ### **Parameters:**
@@ -29,7 +29,7 @@ None
 
 
 
-在`symbols`对应的信息组里，显示的是hydax币币交易的symbol的信息（精度等），与期权交易并无关联，可以忽略。
+在`symbols`对应的信息组里，显示的是币币交易的symbol的信息（精度等），与期权交易并无关联，可以忽略。
 
 在 `options`对应的信息组里，所有当前正在交易的期权信息将会被返回：
 
@@ -106,7 +106,7 @@ None
 
 ### **Request URL:**
 ```
-GET /getOptions
+GET /openapi/v1/getOptions
 ```
 
 ### **Parameters：**
@@ -193,7 +193,7 @@ None
 
 ### **Request Url:**
 ```
-GET /quote/v1/option/depth
+GET /openapi/quote/v1/option/depth
 ```
 
 ### **Parameters:**
@@ -266,7 +266,7 @@ GET /quote/v1/option/depth
 
 ### **Request URL:**
 ```
-GET /quote/v1/option/trades
+GET /openapi/quote/v1/option/trades
 ```
 ### **Parameters：**
 名称|类型|是否强制|默认|描述
@@ -305,7 +305,7 @@ GET /quote/v1/option/trades
 
 ### **Request URL:**
 ```
-GET /quote/v1/option/klines
+GET /openapi/quote/v1/option/klines
 ```
 
 ### **Parameters：**
@@ -363,13 +363,13 @@ GET /quote/v1/option/klines
 
 ### **Request URL:**
 ```bash
-POST /openapi/option/order
+POST /openapi/option/v1/order
 ```
 
 ### **Parameters：**
 
 名称|类型|是否强制|描述
------------- | ------------ | ------------ | ------------ 
+------------ | ------------ | ------------ | ------------
 `symbol`|string|`YES`|期权名称
 `clientOrderId`|string/long|`NO`|订单的ID。可自己定义，如果没有发送，将会自动生成。
 `side`|string|`YES`|订单方向。可能出现的值只能为：`BUY`（买入做多） 和 `SELL`（卖出做空）
@@ -437,13 +437,13 @@ POST /openapi/option/order
 
 ### **Request Url:**
 ```bash
-DELETE /openapi/option/order/cancel
+DELETE /openapi/option/v1/order/cancel
 ```
 
 ### **Parameter:**
 
 名称|类型|是否强制|描述
------------- | ------------ | ------------ | ------------ 
+------------ | ------------ | ------------ | ------------
 `orderId`|integer|`NO`|系统自动生成的订单ID。
 `clientOrderId`|string/long|`NO`|自己传送的订单ID。
 
@@ -506,7 +506,7 @@ DELETE /openapi/option/order/cancel
 
 ### **Request Url:**
 ```bash
-GET /openapi/option/openOrders
+GET /openapi/option/v1/openOrders
 ```
 
 ### **Parameters:**
@@ -580,13 +580,13 @@ GET /openapi/option/openOrders
 
 ### **Request Url:**
 ```bash
-GET /openapi/option/positions
+GET /openapi/option/v1/positions
 ```
 
 ### **Parameters:**
 
 名称|类型|是否强制|描述
------------- | ------------ | ------------ | ------------ 
+------------ | ------------ | ------------ | ------------
 `symbol`|string|`NO`|期权名称，如果没有发送默认返回所有期权的仓位。
 
 ### **Response:**
@@ -636,7 +636,7 @@ GET /openapi/option/positions
 
 ### **Request Url:**
 ```bash
-GET /openapi/option/historyOrders
+GET /openapi/option/v1/historyOrders
 ```
 
 ### **Parameters:**
@@ -698,6 +698,74 @@ Parameter|type|required|default|description
 }
 ```
 
+## `getOrder`
+
+获取某个订单的详细信息
+
+### **Request Weight:**
+
+1
+
+### **Request Url:**
+```bash
+GET /openapi/option/v1/getOrder
+```
+
+### **Parameters:**
+名称|类型|是否强制|默认|描述
+------------ | ------------ | ------------ | ------------ | --------
+`orderId`|integer|`NO`||订单ID
+`clientOrderId`|string|`NO`||用户定义的订单ID
+
+**注意：**` orderId` 或者 `clientOrderId` **必须发送其中之一**
+
+
+### **Response:**
+名称|类型|例子|描述
+------------ | ------------ | ------------ | ------------
+`time`|long|`1551062936784`|订单创建时的时间戳，毫秒（ms）
+`updateTime`|long|`1551062936784`|上次订单更新时间，毫秒（ms)
+`orderId`|integer|`891`|订单ID（系统生成）
+`clientOrderId`|integer|`213443`|订单ID（自己发送的）
+`symbol`|string|`BTC0412CS4200`|期权名称
+`price`|float|`4765.29`|订单价格
+`origQty`|float|`1.01`|订单数量
+`executedQty`|float|`1.01`|已经成交订单数量
+`avgPrice`|float|`4754.24`|订单已经成交的平均价格
+`type`|string|`LIMIT`|订单类型。可能出现的值只能为:`LIMIT`(限价)和`MARKET`（市价）
+`side`|string|`BUY`|订单方向。可能出现的值只能为：`BUY`（买入做多） 和 `SELL`（卖出做空）
+`status`|string|`NEW`|订单状态。可能出现的值为：`NEW`(新订单，无成交)、`PARTIALLY_FILLED`（部分成交）、`FILLED`（全部成交）、`CANCELED`（已取消）和`REJECTED`（订单被拒绝）.
+`timeInForce`|string|`GTC`|订单时间指令（Time in Force）。可能出现的值为：`GTC`（Good Till Canceled，一直有效），`FOK`（Fill or Kill，全部成交或者取消），`IOC`（Immediate or Cancel，立即成交或者取消）.
+`fees`|||订单产生的手续费
+
+在`fees`里:
+
+名称|类型|例子|描述
+------------ | ------------ | ------------ | ------------
+`feeToken`|string|`USDT`|手续费计价单位
+`fee`|float|`0`|实际费用值
+
+### **Example:**
+
+```js
+{
+  'time':1541161088303,
+  'updateTime': 1541161088303,
+  'orderId': 28,
+  'clientOrderId': 213443,
+  'symbol': 'BTC0412CS4200',
+  'price': 102.32,
+  'origQty': 21.3,
+  'executedQty': 10.2,
+  'avgPrice': 3121.13
+  'type': 'LIMIT',
+  'side': 'SELL',
+  'status': 'NEW',
+  'timeInForce': 'GTC',
+  'fees':[]
+}
+```
+
 ## `myTrades`
 
 获取当前账户的成交订单记录。这个API端点需要你的签名。
@@ -708,7 +776,7 @@ Parameter|type|required|default|description
 
 ### **Request Url:**
 ```bash
-GET /openapi/option/myTrades
+GET /openapi/option/v1/myTrades
 ```
 
 ### **Parameters:**
@@ -727,6 +795,7 @@ Parameter|type|required|default|description
 `time`|long|`1503439494351`|订单成交时的时间戳，毫秒（ms）
 `tradeId`|long|`49366`|成交订单ID
 `orderId`|long|`630491422`|	订单ID
+`matchOrderId`|long|`630491432`| 成交对方订单ID
 `price`|float|`0.055`|订单价格
 `quantity`|float|`23.3`|订单数量
 `feeTokenName`|string|`USDT`|手续费计价单位
@@ -742,6 +811,7 @@ Parameter|type|required|default|description
     'time': '1554897921663',
     'tradeId': '336902617393292032',
     'orderId': '336902617267462912',
+    "matchOrderId": 336002617267469062,
     'price': '99',
     'quantity': '11.414',
     'feeTokenName': 'BUSDT',
@@ -763,7 +833,7 @@ Parameter|type|required|default|description
 
 ### **Request Url:**
 ```bash
-GET  /openapi/option/settlements
+GET  /openapi/option/v1/settlements
 ```
 ### **Parameters:**
 None
@@ -771,7 +841,7 @@ None
 ### **Responses:**
 
 名称|类型|例子|描述
------------- | ------------ | ------------ | ------------ 
+------------ | ------------ | ------------ | ------------
 `symbol`|string|`BTC0412PS3900`|期权名称
 `optionType`|string|`call`|期权类型
 `margin`|float|`400`|仓位所需的保证金
@@ -810,7 +880,7 @@ None
 
 ### **Request Url:**
 ```bash
-GET  /openapi/option/account
+GET  /openapi/option/v1/account
 ```
 
 ### **Parameters:**
